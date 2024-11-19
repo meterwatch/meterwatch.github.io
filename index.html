@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meter Watch Dashboard v8</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --background: 240 10% 93%;
+            --foreground: 256 24% 28%;
+            --card: 0 0% 100%;
+            --card-foreground: 256 24% 28%;
+            --primary: 14 72% 45%;
+            --primary-foreground: 0 0% 100%;
+            --secondary: 256 24% 28%;
+            --secondary-foreground: 240 10% 93%;
+            --muted: 240 5% 96%;
+            --muted-foreground: 256 8% 38%;
+            --accent: 14 72% 45%;
+            --accent-foreground: 0 0% 100%;
+            --radius: 0.5rem;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+        }
+
+        .navbar {
+            background-color: #3c3251;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            color: #ececf0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-link {
+            color: #ececf0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #c74e20;
+        }
+
+        .hero img {
+            max-height: 300px; /* Limit the height to 300px */
+            width: auto; /* Maintain aspect ratio */
+            object-fit: contain; /* Ensure the image scales nicely */
+        }
+
+
+         .hero {
+            background-color: #f8f9fa; /* Light background instead of image */
+            color: #3c3251;
+            padding: 100px 0;
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(236, 236, 240, 0.7);
+        }
+
+        .hero-content {
+        position: relative;
+        z-index: 1;
+        }
+
+        .hero h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #c74e20;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            line-height: 1.4;
+        }
+
+        .input-group .form-control {
+            border-radius: var(--radius) 0 0 var(--radius);
+        }
+
+        .input-group .btn {
+            border-radius: 0 var(--radius) var(--radius) 0;
+            background-color: #c74e20;
+            border-color: #c74e20;
+        }
+
+        .input-group .btn:hover {
+            background-color: #a03d18;
+            border-color: #a03d18;
+        }
+
+        .hero svg {
+            width: 50%;
+            height: auto;
+        }
+
+
+        .chart-container {
+            background-color: #ececf0;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #3c3251;
+        }
+
+        .disclaimer {
+            font-size: 0.8rem;
+            color: #3c3251;
+            margin-top: 10px;
+        }
+
+        .calendar-wrapper {
+            padding: 20px;
+            background: white;
+            border-radius: var(--radius);
+        }
+
+        .calendar {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .month-name {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #3c3251;
+        }
+
+        .calendar-grid {
+            width: 100%;
+        }
+
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+
+        .weekday {
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+            color: #3c3251;
+        }
+
+        .week {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+
+        .day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-size: 18px;
+            color: #ffffff;
+            transition: opacity 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .day:hover {
+            opacity: 0.8;
+        }
+
+        .day.empty {
+            background-color: transparent;
+            cursor: default;
+        }
+
+        .day-tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #ffffff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .day:hover .day-tooltip,
+        .day:focus .day-tooltip {
+            opacity: 1;
+        }
+
+        .branding {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            border-radius: var(--radius);
+            text-align: center;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.2rem;
+            }
+
+            .weekday {
+                font-size: 14px;
+                padding: 5px;
+            }
+
+            .day {
+                font-size: 16px;
+            }
+
+            .chart-wrapper {
+                height: auto; /* Ensure it adjusts to the viewport on smaller screens */
+            }
+        }
+        .scale-legend {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: var(--radius);
+}
+
+.scale-item {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+.scale-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+}
+
+.chart-wrapper {
+    height: 400px; /* Adjust to a suitable height for the chart */
+    overflow: hidden; /* Prevent overflow content from affecting the display */
+    background-color: #fff; /* Optional, you can style the background as needed */
+}
+
+#loadshedding-chart {
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.energy-report-section {
+    padding: 30px 0;
+    text-align: center;
+}
+
+.energy-report-heading {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333; /* Adjust color as needed */
+    margin-bottom: 15px;
+}
+
+.energy-report-description {
+    font-size: 1.1rem;
+    color: #555;
+    max-width: 800px;
+    margin: 0 auto 30px;
+}
+
+
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">Meter Watch</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <!--<a class="nav-link" href="#">About</a>-->
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="report.html">Energy Reports</a>
+                    </li>
+                    <li class="nav-item">
+                        <!--<a class="nav-link" href="#">Dashboard</a>-->
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="lightbulb.svg" class="img-fluid" alt="" data-aos="zoom-out" data-aos-delay="100">
+                </div>
+                <div class="col-md-6">
+                    <h1>
+                        Meter Watch
+                    </h1>
+                    <p>
+                        Track your prepaid power usage effortlessly!
+                    </p>
+                    <div class="input-group mb-3">
+                        <input type="text" id="search-input" class="form-control" placeholder="Enter Zesa metre number" aria-label="Enter your account number" aria-describedby="search-button" >
+                        <button class="btn btn-primary" type="button" id="search-button">Check Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Section for Energy Report -->
+<div class="energy-report-section">
+    <h2 class="energy-report-heading">Energy Report</h2>
+    <p class="energy-report-description">This report provides insights into the energy generation and consumption trends based on recent data. Explore the charts below for detailed analysis.</p>
+</div>
+
+    <div class="container">
+        <div id="purchase-history-container" class="chart-container" style="display: none;">
+            <div class="chart-title">Purchase History</div>
+            <div class="chart-wrapper">
+                <canvas id="purchase-history-chart"></canvas>
+            </div>
+            <div class="d-flex justify-content-center mt-3">
+                <button id="view-more-button" class="btn btn-primary me-2">View More Details</button>
+                <button id="hide-button" class="btn btn-secondary">Hide</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="chart-container">
+                    <div class="chart-title">Power Generation :1188.5MW  </div>
+                    <div class="chart-wrapper">
+                        <canvas id="power-generation-chart"></canvas>
+                    </div>
+                    <p class="disclaimer">Source:www.zpc.co.zw (16 Nov 2024)</p>
+                </div>
+            </div>
+            <div class="col-md-8 mb-4">
+                <div class="chart-container">
+                    <div class="chart-title">Most Common kWh Purchases - October 2024</div>
+                    <div class="chart-wrapper">
+                        <canvas id="loadshedding-chart"></canvas>
+                    </div>
+                    <p class="disclaimer">Source Belenga MyEnergy</p>
+                </div>
+                <div class="button-container">
+                    <a href="report.html" target="_blank">
+                        <button id="view-more-button" class="btn btn-primary me-2">
+                            View October Energy Report
+                        </button>
+                    </a>
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">
+                Hours of Loadshedding: November 2024
+            </div>
+            <div class="calendar-wrapper">
+                <div class="calendar">
+                    <div class="month-name">November 2024</div>
+                    <div class="calendar-grid">
+                        <div class="weekdays">
+                            <div class="weekday">SUN</div>
+                            <div class="weekday">MON</div>
+                            <div class="weekday">TUE</div>
+                            <div class="weekday">WED</div>
+                            <div class="weekday">THU</div>
+                            <div class="weekday">FRI</div>
+                            <div class="weekday">SAT</div>
+                        </div>
+                        <div class="week">
+                            <div class="day empty"></div>
+                            <div class="day empty"></div>
+                            <div class="day empty"></div>
+                            <div class="day empty"></div>
+                            <div class="day empty"></div>
+                            <div class="day" style="background-color: #36161c;" data-value="80">1<span class="day-tooltip">15Hrs-20Hrs</span></div>
+                            <div class="day" style="background-color: #36161c;" data-value="80">2<span class="day-tooltip">15Hrs-20Hrs</span></div>
+                        </div>    
+                        <div class="week">
+                            <div class="day" style="background-color: #36161c;" data-value="80">3<span class="day-tooltip">15Hrs-20Hrs</span></div>
+                            <div class="day" style="background-color: #98352a;" data-value="40">4<span class="day-tooltip">5Hrs-10Hrs</span></div>
+                            <div class="day" style="background-color: #98352a;" data-value="40">5<span class="day-tooltip">5Hrs-10Hrs</span></div>
+                            <div class="day" style="background-color: #36161c;" data-value="80">6<span class="day-tooltip">15Hrs-20Hrs</span></div>
+                            <div class="day" style="background-color: #36161c;" data-value="80">7<span class="day-tooltip">15Hrs-20Hrs</span></div>
+                            
+                            <div class="day" style="background-color: #36161c;" data-value="80">8<span class="day-tooltip">15Hrs-20Hrs</span></div>
+                            <div class="day" style="background-color: #672328;" data-value="60">9<span class="day-tooltip">10Hrs-15Hrs</span></div>
+                        </div>    
+                        <div class="week">
+                            <div class="day" style="background-color: #000000;" data-value="100">10<span class="day-tooltip">20Hrs-24Hrs</span></div>
+                            <div class="day" style="background-color: green;" data-value="0">11<span class="day-tooltip"> 0</span></div>
+                            <div class="day" style="background-color: #000000;" data-value="100">12<span class="day-tooltip">20Hrs-24Hrs</span></div>
+
+                            <div class="day" style="background-color: #000000;" data-value="100">13<span class="day-tooltip">20Hrs-24Hrs</span></div>
+                            <div class="day" style="background-color: #98352a;" data-value="40">14<span class="day-tooltip">5Hrs-10Hrs</span></div>
+                            <div class="day" style="background-color: #000000;" data-value="100">15<span class="day-tooltip">20Hrs-24Hrs</span></div>
+
+                            <div class="day" style="background-color: #36161c;" data-value="80">16<span class="day-tooltip">15Hrs-20Hrs</span></div>
+                        </div>
+                        <div class="week">
+                            <div class="day" style="background-color: #98352a;" data-value="40">17<span class="day-tooltip">5Hrs-10Hrs</span></div>
+                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                        </div>
+                        <div class="week">
+                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day empty"></div>
+                            <div class="day empty"></div>
+
+
+                            <!--<div class="day" style="background-color: #c54f20;" data-value="20">1<span class="day-tooltip">Value: 20</span></div>
+                                <div class="day" style="background-color: #98352a;" data-value="40">2<span class="day-tooltip">Value: 40</span></div>
+                                <div class="day" style="background-color: #672328;" data-value="60">3<span class="day-tooltip">Value: 60</span></div>
+                                <div class="day" style="background-color: #36161c;" data-value="80">4<span class="day-tooltip">Value: 80</span></div>
+                                <div class="day" style="background-color: #000000;" data-value="100">5<span class="day-tooltip">Value: 100</span></div>-->
+                        </div>
+                    </div>
+                </div>
+                 <div class="scale-legend">
+                    <p></p>
+                    <div class="scale-item">
+                        <div class="scale-color" style="background-color: #c54f20;"></div>
+                        <span>0-5Hrs</span>
+                    </div>
+                    <div class="scale-item">
+                        <div class="scale-color" style="background-color: #98352a;"></div>
+                        <span>5Hrs-10Hrs</span>
+                    </div>
+                    <div class="scale-item">
+                        <div class="scale-color" style="background-color: #672328;"></div>
+                        <span>10Hrs-15Hrs</span>
+                    </div>
+                    <div class="scale-item">
+                        <div class="scale-color" style="background-color: #36161c;"></div>
+                        <span>15Hrs-20Hrs</span>
+                    </div>
+                    <div class="scale-item">
+                        <div class="scale-color" style="background-color: #000000;"></div>
+                        <span>20Hrs-24Hrs</span>
+                    </div>
+                </div>
+                <div class="branding">
+                    <span></span>
+                    <span>Source: Self Monitoring</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="dayModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Selected Day</h2>
+            <p id="modalContent"></p>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            createCharts();
+            setupSearchFunction();
+            setupCalendarInteraction();
+        });
+
+        function setupCalendarInteraction() {
+            const days = document.querySelectorAll('.day:not(.empty)');
+            const modal = document.getElementById('dayModal');
+            const modalContent = document.getElementById('modalContent');
+            const closeBtn = document.getElementsByClassName('close')[0];
+
+            days.forEach(day => {
+                day.addEventListener('click', () => {
+                    const value = day.getAttribute('data-value');
+                    const date = day.textContent;
+                    modalContent.textContent = `Date: April ${date}, 2024 | Value: ${value}`;
+                    modal.style.display = 'block';
+                });
+            });
+
+            closeBtn.onclick = function() {
+                modal.style.display = 'none';
+            }
+
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            }
+        }
+        /*
+        function setupSearchFunction() {
+            const searchButton = document.getElementById('search-button');
+            const purchaseHistoryContainer = document.getElementById('purchase-history-container');
+            const viewMoreButton = document.getElementById('view-more-button');
+            const hideButton = document.getElementById('hide-button');
+
+            searchButton.addEventListener('click', () => {
+                purchaseHistoryContainer.style.display = 'block';
+                createPurchaseHistoryChart();
+            });
+
+            viewMoreButton.addEventListener('click', () => {
+                alert('Viewing more details...');
+                // Implement view more details functionality here
+            });
+
+            hideButton.addEventListener('click', () => {
+                purchaseHistoryContainer.style.display = 'none';
+            });
+        }*/
+
+            function setupSearchFunction() {
+            const searchButton = document.getElementById('search-button');
+            
+            
+            
+
+            searchButton.addEventListener('click', () => {
+                
+                createPurchaseHistoryChart();
+                sendRequest1()
+            });
+
+            
+        }
+
+            function sendRequest1() {
+
+                
+                //get metre number 
+                var metreNumber = document.getElementById('search-input').value;
+                //var metreNumber = document.getElementById('MeterNumber').value;
+
+                // If the input is empty, set the meter number to the default value
+                if (!metreNumber.trim()) {
+                    metreNumber = '14102870798'; // Default value
+                }
+                
+                //console.log(metreNumber)
+                var url = 'https://tdccheck.onrender.com/tb?num1='+metreNumber; // Specify the URL without query parameters
+                
+                // Data to send in the request body
+                var data = {
+                    num1: metreNumber,
+                    num2: 1
+                };
+                //console.log(url);
+
+                axios.post(url, data)
+                    .then((response) => {
+                        if (response.data && response.data.encodedMeter) {
+                            window.location.href = 'https://myenergy.blnga.co.zw/report.html?variable' + response.data.encodedMeter;
+                            
+                        } else {
+                            console.error('Error: Null or unexpected value received.');
+                            alert('Received an unexpected response. Please try again.');
+                            
+                        }
+                    })
+                    .catch((error) => {
+                        if (error.response) {
+                            // Server responded with a status other than 2xx
+                            console.error('Error:', error.response.status, error.response.data);
+                            alert('Server error: ' + error.response.status + '. Please try again later.');
+                            
+                        } else if (error.request) {
+                            // Request was made but no response was received
+                            console.error('Error: No response received from server.');
+                            alert('No response from server. Please check your network connection and try again.');
+                            
+                        } else {
+                            // Something else happened
+                            console.error('Error:', error.message);
+                            alert('An error occurred: ' + error.message + '. Please try again.');
+                            
+                        }
+                        
+                    });
+        }
+
+
+
+
+
+
+
+
+
+
+
+        function createPurchaseHistoryChart() {
+            const ctx = document.getElementById('purchase-history-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                    datasets: [{
+                        label: 'Purchase Amount ($)',
+                        data: [65, 59, 80, 81, 56],
+                        backgroundColor: '#c74e20',
+                        borderColor: '#3c3251',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount ($)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createCharts() {
+            createPowerGenerationChart();
+            createLoadshedingChart();
+        }
+
+        function createPowerGenerationChart() {
+            const ctx = document.getElementById('power-generation-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Hwange', 'Kariba', 'IPP'],
+                    datasets: [{
+                        data: [999, 124.5, 65],
+                        backgroundColor: ['#c74e20', '#3c3251', '#ececf0']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Power Generation (MW)'
+                        }
+                    }
+                }
+            });
+        }
+
+        function createLoadshedingChart() {
+            const ctx = document.getElementById('loadshedding-chart').getContext('2d');
+            const data = [
+                0,41,21,20,10,15,7,11,7,5,2,9,1,5,3,4,1,0,1,5,1,0,5
+                ];
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [
+                        "0-50","51-100","101-150","151-200","201-250","251-300","301-350","351-400","401-450","451-500","501-550","551-600","601-650","651-700","701-750","751-800","801-850","851-900","901-950","951-1000","1001-1050","1051-1100","1100+"
+                        ],
+                    datasets: [{
+                        label: 'Most Common kWh Purchases - October 2024',
+                        data: data,
+                        backgroundColor: '#c74e20',
+                        borderColor: '#3c3251',
+                        borderWidth: 1,
+                        fill: true,
+                        backgroundColor: 'rgba(199, 78, 32, 0.2)',
+                        borderColor: 'rgba(199, 78, 32, 1)',
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Frequency of Purchase'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'kWh Purchased'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
