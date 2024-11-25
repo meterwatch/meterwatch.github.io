@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meter Watch Dashboard v8</title>
+    <title>MeterWatch</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GVRPV64YPR"></script>
@@ -28,6 +28,12 @@
             --accent: 14 72% 45%;
             --accent-foreground: 0 0% 100%;
             --radius: 0.5rem;
+            --bs-spinner-width: 2rem;
+    		--bs-spinner-height: 2rem;
+    		--bs-spinner-vertical-align: -0.125em;
+    		--bs-spinner-border-color: currentColor;
+    		--bs-spinner-animation-speed: 0.75s;
+    		--bs-spinner-animation-name: spinner-grow;
         }
 
         body {
@@ -303,59 +309,108 @@
             }
         }
         .scale-legend {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border-radius: var(--radius);
-}
+    		display: flex;
+    		justify-content: space-between;
+    		margin-top: 20px;
+    		padding: 10px;
+    		background-color: #f8f9fa;
+    		border-radius: var(--radius);
+		}
 
-.scale-item {
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-}
+		.scale-item {
+    		display: flex;
+    		align-items: center;
+    		font-size: 14px;
+		}
 
-.scale-color {
-    width: 20px;
-    height: 20px;
-    margin-right: 5px;
-    border-radius: 3px;
-}
+		.scale-color {
+		    width: 20px;
+		    height: 20px;
+		    margin-right: 5px;
+		    border-radius: 3px;
+		}
 
-.chart-wrapper {
-    height: 400px; /* Adjust to a suitable height for the chart */
-    overflow: hidden; /* Prevent overflow content from affecting the display */
-    background-color: #fff; /* Optional, you can style the background as needed */
-}
+		.chart-wrapper {
+		    height: 400px; /* Adjust to a suitable height for the chart */
+		    overflow: hidden; /* Prevent overflow content from affecting the display */
+		    background-color: #fff; /* Optional, you can style the background as needed */
+		}
 
-#loadshedding-chart {
-    max-height: 100%;
-    max-width: 100%;
-}
+		#loadshedding-chart {
+		    max-height: 100%;
+		    max-width: 100%;
+		}
 
-.energy-report-section {
-    padding: 30px 0;
-    text-align: center;
-}
+		.energy-report-section {
+		    padding: 30px 0;
+		    text-align: center;
+		}
 
-.energy-report-heading {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #333; /* Adjust color as needed */
-    margin-bottom: 15px;
-}
+		.energy-report-heading {
+		    font-size: 2rem;
+		    font-weight: bold;
+		    color: #333; /* Adjust color as needed */
+		    margin-bottom: 15px;
+		}
 
-.energy-report-description {
-    font-size: 1.1rem;
-    color: #555;
-    max-width: 800px;
-    margin: 0 auto 30px;
-}
-
-
+		.energy-report-description {
+		    font-size: 1.1rem;
+		    color: #555;
+		    max-width: 800px;
+		    margin: 0 auto 30px;
+		}
     </style>
+    <style>
+
+        .spinner-border,
+		.spinner-grow {
+    		border-radius: 50% !important; /* Ensures circular appearance */
+		}
+		@keyframes spinner-grow {
+    		0% {
+        		transform: scale(0);
+    		}
+    		50% {
+        		opacity: 1;
+    		}
+    		100% {
+        		transform: scale(1);
+        		opacity: 0;
+    		}
+		}
+		@keyframes spinner-border {
+		    100% {
+		        transform: rotate(360deg);
+		    }
+		}
+	.spinner-grow,
+	.spinner-border {
+	    unicode-bidi: initial !important;
+	}
+
+	.loading-indicator {
+	    width: 20px;
+	    height: 20px;
+	    border: 2px solid #f3f3f3;
+	    border-top: 2px solid #3498db;
+	    border-radius: 50%;
+	    animation: spin 1s linear infinite;
+	    margin-left: 10px;
+	}
+
+	@keyframes spin {
+	    0% { transform: rotate(0deg); }
+	    100% { transform: rotate(360deg); }
+	}
+
+    #loading-spinner {
+        display: none ;
+    }
+</style>
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="manifest" href="site.webmanifest">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg">
@@ -399,6 +454,9 @@
                     <div class="input-group mb-3">
                         <input type="text" id="search-input" class="form-control" placeholder="Enter Zesa metre number" aria-label="Enter your account number" aria-describedby="search-button" >
                         <button class="btn btn-primary" type="button" id="search-button">Check Now</button>
+                        <div id="loading-spinner" class="spinner-border text-primary ms-2" role="status" style="display: none;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -408,8 +466,8 @@
 
 <!-- New Section for Energy Report -->
 <div class="energy-report-section">
-    <h2 class="energy-report-heading">Energy Report</h2>
-    <p class="energy-report-description">This report provides insights into the energy generation and consumption trends based on recent data. Explore the charts below for detailed analysis.</p>
+    <h2 class="energy-report-heading">Harnessing Energy Data for a Sustainable Future</h2>
+    <p class="energy-report-description">MeterWatch provides real-time insights into energy generation and consumption trends. Explore interactive charts and analytics to make informed decisions for sustainability and efficiency."</p>
 </div>
 
     <div class="container">
@@ -427,35 +485,37 @@
         <div class="row">
             <div class="col-md-4 mb-4">
                 <div class="chart-container">
-                    <div class="chart-title">Power Generation :1188.5MW  </div>
+                    <div class="chart-title">Power Generation Comparison (MW): 2024 vs 2023  </div>
                     <div class="chart-wrapper">
                         <canvas id="power-generation-chart"></canvas>
                     </div>
-                    <p class="disclaimer">Source:www.zpc.co.zw (16 Nov 2024)</p>
+                    <p class="disclaimer">Source:www.zpc.co.zw </p>
                 </div>
             </div>
             <div class="col-md-8 mb-4">
                 <div class="chart-container">
-                    <div class="chart-title">Most Common kWh Purchases - October 2024</div>
+                    <div class="chart-title">51kWh - 10kWh still the most common kWh range purchase in October 2024</div>
                     <div class="chart-wrapper">
                         <canvas id="loadshedding-chart"></canvas>
                     </div>
                     <p class="disclaimer">Source Belenga MyEnergy</p>
                 </div>
-                <div class="button-container">
-                    <a href="report.html" target="_blank">
-                        <button id="view-more-button" class="btn btn-primary me-2">
-                            View October Energy Report
-                        </button>
+                <div class="input-group button-container">
+                    <a href="report.html" >
+                       <button 
+    						id="view-more-button" 
+    						class="btn btn-primary me-2" 
+    						style="border-radius: 0;">
+    						View October Energy Report
+						</button>
                     </a>
-                    
                 </div>
             </div>
         </div>
 
         <div class="chart-container">
             <div class="chart-title">
-                Hours of Loadshedding: November 2024
+                Loadshedding Hours: November 2024
             </div>
             <div class="calendar-wrapper">
                 <div class="calendar">
@@ -476,47 +536,49 @@
                             <div class="day empty"></div>
                             <div class="day empty"></div>
                             <div class="day empty"></div>
-                            <div class="day" style="background-color: #36161c;" data-value="80">1<span class="day-tooltip">15Hrs-20Hrs</span></div>
-                            <div class="day" style="background-color: #36161c;" data-value="80">2<span class="day-tooltip">15Hrs-20Hrs</span></div>
+                            <div class="day" style="background-color: #E74C3C;" data-value="15Hrs-20Hrs">1<span class="day-tooltip">November 2024 </span></div>
+                            <div class="day" style="background-color: #E74C3C;" data-value="15Hrs-20Hrs">2<span class="day-tooltip">November 2024 </span></div>
                         </div>    
                         <div class="week">
-                            <div class="day" style="background-color: #36161c;" data-value="80">3<span class="day-tooltip">15Hrs-20Hrs</span></div>
-                            <div class="day" style="background-color: #98352a;" data-value="40">4<span class="day-tooltip">5Hrs-10Hrs</span></div>
-                            <div class="day" style="background-color: #98352a;" data-value="40">5<span class="day-tooltip">5Hrs-10Hrs</span></div>
-                            <div class="day" style="background-color: #36161c;" data-value="80">6<span class="day-tooltip">15Hrs-20Hrs</span></div>
-                            <div class="day" style="background-color: #36161c;" data-value="80">7<span class="day-tooltip">15Hrs-20Hrs</span></div>
+                            <div class="day" style="background-color: #E74C3C;" data-value="15Hrs-20Hrs">3<span class="day-tooltip">November 2024 </span></div>
+                            <div class="day" style="background-color: #F7D154;" data-value="5Hrs-10Hrs">4<span class="day-tooltip">November 2024 </span></div>
+                            <div class="day" style="background-color: #F7D154;" data-value="5Hrs-10Hrs">5<span class="day-tooltip">November 2024 </span></div>
+                            <div class="day" style="background-color: #E74C3C;" data-value="15Hrs-20Hrs">6<span class="day-tooltip">November 2024 </span></div>
+                            <div class="day" style="background-color: #E74C3C;" data-value="15Hrs-20Hrs">7<span class="day-tooltip">November 2024 </span></div>
                             
-                            <div class="day" style="background-color: #36161c;" data-value="80">8<span class="day-tooltip">15Hrs-20Hrs</span></div>
-                            <div class="day" style="background-color: #672328;" data-value="60">9<span class="day-tooltip">10Hrs-15Hrs</span></div>
+                            <div class="day" style="background-color: #E74C3C;" data-value="15Hrs-20Hrs">8<span class="day-tooltip">November 2024 </span></div>
+                            <div class="day" style="background-color: #FF9F43;" data-value="10Hrs-15Hrs">9<span class="day-tooltip">November 2024 </span></div>
                         </div>    
                         <div class="week">
-                            <div class="day" style="background-color: #000000;" data-value="100">10<span class="day-tooltip">20Hrs-24Hrs</span></div>
-                            <div class="day" style="background-color: green;" data-value="0">11<span class="day-tooltip"> 0</span></div>
-                            <div class="day" style="background-color: #000000;" data-value="100">12<span class="day-tooltip">20Hrs-24Hrs</span></div>
+                            <div class="day" style="background-color: #8B0000;" data-value="20Hrs-24Hrs">10<span class="day-tooltip">November 2024 </span></div>
+                            <div class="day" style="background-color: #A3D977;" data-value="0">11<span class="day-tooltip">November 2024 </span></div>
+                            <div class="day" style="background-color: #8B0000;" data-value="20Hrs-24Hrs">12<span class="day-tooltip">November 2024 </span></div>
 
-                            <div class="day" style="background-color: #000000;" data-value="100">13<span class="day-tooltip">20Hrs-24Hrs</span></div>
-                            <div class="day" style="background-color: #98352a;" data-value="40">14<span class="day-tooltip">5Hrs-10Hrs</span></div>
-                            <div class="day" style="background-color: #000000;" data-value="100">15<span class="day-tooltip">20Hrs-24Hrs</span></div>
+                            <div class="day" style="background-color: #8B0000;" data-value="20Hrs-24Hrs">13<span class="day-tooltip">November 2024 </span></div>
+                            <div class="day" style="background-color: #F7D154;" data-value="5Hrs-10Hrs">14<span class="day-tooltip">November 2024 </span></div>
+                            <div class="day" style="background-color: #8B0000;" data-value="20Hrs-24Hrs">15<span class="day-tooltip">November 2024 </span></div>
 
-                            <div class="day" style="background-color: #36161c;" data-value="80">16<span class="day-tooltip">15Hrs-20Hrs</span></div>
+                            <div class="day" style="background-color: #E74C3C;" data-value="15Hrs-20Hrs">16<span class="day-tooltip">November 2024 </span></div>
                         </div>
                         <div class="week">
-                            <div class="day" style="background-color: #98352a;" data-value="40">17<span class="day-tooltip">5Hrs-10Hrs</span></div>
-                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
-                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
-                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
-                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
-                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
-                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #F7D154;" data-value="5Hrs-10Hrs">17<span class="day-tooltip">November 2024 </span></div>
+                            <div class="day" style="background-color: #E74C3C;" data-value="15Hrs-20Hrs">18<span class="day-tooltip">November 2024 </span></div>
+                            <div class="day" style="background-color: #E74C3C;" data-value="15Hrs-20Hrs">19<span class="day-tooltip">November 2024 </span></div>
+                            <div class="day" style="background-color: #E74C3C;" data-value="15Hrs-20Hrs">20<span class="day-tooltip">November 2024 </span></div>
+                            <div class="day" style="background-color: #FF9F43;" data-value="10Hrs-15Hrs">21<span class="day-tooltip">November 2024 </span></div>
+                            <div class="day" style="background-color: #F7D154;" data-value="5Hrs-10Hrs">22<span class="day-tooltip">November 2024 </span></div>
+
+
+                            <div class="day" style="background-color: #8B0000;" data-value="20Hrs-24Hrs">23<span class="day-tooltip">November 2024 </span></div>
                         </div>
                         <div class="week">
-                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
-                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
-                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
-                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
-                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
-                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
-                            <div class="day" style="background-color: #CBC9CF;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #8B0000;" data-value="10Hrs-15Hrs">24<span class="day-tooltip">November 2024 </span></div>
+                            <div class="day" style="background-color: #D3D3D3;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #D3D3D3;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #D3D3D3;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #D3D3D3;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #D3D3D3;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
+                            <div class="day" style="background-color: #D3D3D3;" data-value="00">-<span class="day-tooltip">Value: -</span></div>
                             <div class="day empty"></div>
                             <div class="day empty"></div>
 
@@ -528,23 +590,23 @@
                  <div class="scale-legend">
                     <p></p>
                     <div class="scale-item">
-                        <div class="scale-color" style="background-color: #c54f20;"></div>
+                        <div class="scale-color" style="background-color: #A3D977;"></div>
                         <span>0-5Hrs</span>
                     </div>
                     <div class="scale-item">
-                        <div class="scale-color" style="background-color: #98352a;"></div>
+                        <div class="scale-color" style="background-color: #F7D154;"></div>
                         <span>5Hrs-10Hrs</span>
                     </div>
                     <div class="scale-item">
-                        <div class="scale-color" style="background-color: #672328;"></div>
+                        <div class="scale-color" style="background-color: #FF9F43;"></div>
                         <span>10Hrs-15Hrs</span>
                     </div>
                     <div class="scale-item">
-                        <div class="scale-color" style="background-color: #36161c;"></div>
+                        <div class="scale-color" style="background-color: #E74C3C;"></div>
                         <span>15Hrs-20Hrs</span>
                     </div>
                     <div class="scale-item">
-                        <div class="scale-color" style="background-color: #000000;"></div>
+                        <div class="scale-color" style="background-color: #8B0000;"></div>
                         <span>20Hrs-24Hrs</span>
                     </div>
                 </div>
@@ -572,7 +634,9 @@
             createCharts();
             setupSearchFunction();
             setupCalendarInteraction();
-        });
+            const spinner = document.getElementById("loading-spinner");
+                //spinner.style.display = "none"; // Ensure it's hidden
+            });
 
         function setupCalendarInteraction() {
             const days = document.querySelectorAll('.day:not(.empty)');
@@ -580,14 +644,15 @@
             const modalContent = document.getElementById('modalContent');
             const closeBtn = document.getElementsByClassName('close')[0];
 
-            days.forEach(day => {
-                day.addEventListener('click', () => {
-                    const value = day.getAttribute('data-value');
-                    const date = day.textContent;
-                    modalContent.textContent = `Date: April ${date}, 2024 | Value: ${value}`;
-                    modal.style.display = 'block';
-                });
-            });
+        days.forEach(day => {
+    day.addEventListener('click', () => {
+        const powerCutDuration = day.getAttribute('data-value'); // Get power cut duration
+        const date = day.textContent.trim(); // Get the day number (date)
+        modalContent.textContent = `Date: ${date} | Power Cut: ${powerCutDuration}`;
+        modal.style.display = 'block';
+    });
+});
+
 
             closeBtn.onclick = function() {
                 modal.style.display = 'none';
@@ -623,12 +688,13 @@
 
             function setupSearchFunction() {
             const searchButton = document.getElementById('search-button');
+            const loadingSpinner = document.getElementById('loading-spinner');
             
             
             
 
             searchButton.addEventListener('click', () => {
-                
+                loadingSpinner.style.display = 'inline-block'; // Show the spinner
                 createPurchaseHistoryChart();
                 sendRequest1()
             });
@@ -661,7 +727,8 @@
                 axios.post(url, data)
                     .then((response) => {
                         if (response.data && response.data.encodedMeter) {
-                            window.location.href = 'https://myenergy.blnga.co.zw/report.html?variable' + response.data.encodedMeter;
+                            //window.location.href = 'https://myenergy.blnga.co.zw/report.html?variable' + response.data.encodedMeter;
+                            window.location.href = 'myreport.html?variable' + response.data.encodedMeter;
                             
                         } else {
                             console.error('Error: Null or unexpected value received.');
@@ -687,17 +754,11 @@
                             
                         }
                         
-                    });
+                    })
+                    .finally(() => {
+                document.getElementById('loading-indicator').style.display = 'none'; // Hide the loading indicator
+            });
         }
-
-
-
-
-
-
-
-
-
 
 
         function createPurchaseHistoryChart() {
@@ -741,32 +802,58 @@
             createLoadshedingChart();
         }
 
-        function createPowerGenerationChart() {
-            const ctx = document.getElementById('power-generation-chart').getContext('2d');
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['Hwange', 'Kariba', 'IPP'],
-                    datasets: [{
-                        data: [999, 124.5, 65],
-                        backgroundColor: ['#c74e20', '#3c3251', '#ececf0']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Power Generation (MW)'
-                        }
-                    }
-                }
-            });
-        }
+		function createPowerGenerationChart() {
+		    const ctx = document.getElementById('power-generation-chart').getContext('2d');
+		    new Chart(ctx, {
+		        type: 'bar',
+		        data: {
+		            labels: ['2024', '2023'], // Two bars representing the years
+		            datasets: [
+		                {
+		                    label: 'Hwange',
+		                    data: [859, 674],
+		                    backgroundColor: '#c74e20', // Color for Hwange
+		                },
+		                {
+		                    label: 'Kariba',
+		                    data: [124.5, 570],
+		                    backgroundColor: '#3c3251', // Color for Kariba
+		                },
+		                {
+		                    label: 'IPP',
+		                    data: [50, 41],
+		                    backgroundColor: '#D0D0D9', // Color for IPP
+		                }
+		            ]
+		        },
+		        options: {
+		            responsive: true,
+		            maintainAspectRatio: false,
+		            plugins: {
+		                legend: {
+		                    position: 'bottom',
+		                },
+		                title: {
+		                    display: true,
+		                    text: 'Sunday 24 November 2024'
+		                }
+		            },
+		            scales: {
+		                x: {
+		                    stacked: true, // Enable stacking for x-axis
+		                },
+		                y: {
+		                    stacked: true, // Enable stacking for y-axis
+		                    title: {
+		                        display: true,
+		                        text: 'Power Generation (MW)'
+		                    }
+		                }
+		            }
+		        }
+		    });
+		}
+
 
         function createLoadshedingChart() {
             const ctx = document.getElementById('loadshedding-chart').getContext('2d');
