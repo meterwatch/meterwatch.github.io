@@ -56,6 +56,10 @@
             color: #c74e20;
         }
     </style>
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="manifest" href="site.webmanifest">
 </head>
 <body>
 
@@ -85,11 +89,11 @@
     </nav>
     <div class="container my-5">
         <h1 class="text-center my-4">October 2024  Energy Reports</h1>
-        <h1 class="text-center mb-4">Energy Usage Distribution</h1>
+        
         
         <!-- First Chart -->
         <div class="chart-container">
-            <div class="chart-title">Household Daily Energy Usage</div>
+            <div class="chart-title">Household Daily Energy Consumption: Peak Usage at 6 kWh, with a Range of Consumption Patterns</div>
             <canvas id="areaChart1"></canvas>
             <p>
                 This chart represents the daily energy consumption patterns of households. The most common usage range is between 6 kWh and 10 kWh, indicating that households typically consume moderate amounts of electricity each day, possibly impacted by loadsheding. Usage above 12 kWh is less frequent, reflecting either cost-conscious behavior or energy efficiency practices. Interestingly, a small percentage of households report consuming 70 kWh or more, possibly representing larger households or those with higher energy needs.
@@ -100,7 +104,7 @@
 
         <!-- Second Chart -->
         <div class="chart-container">
-            <div class="chart-title">Frequency of Token Purchases</div>
+            <div class="chart-title">Household Token Purchase Behavior: A Preference for Manageable Amounts</div>
             <canvas id="areaChart2"></canvas>
             <p>
                 The data reveals that 51-100 kWh is the most common purchase range, followed closely by 101-150 kWh. This trend indicates that households prefer purchasing energy in manageable amounts that align with typical consumption patterns. Purchases decrease sharply beyond 250 kWh, with minimal activity in the higher ranges. The few instances of purchases above 900 kWh likely represent commercial or larger residential setups.
@@ -110,7 +114,7 @@
 
         <!-- Third Chart -->
         <div class="chart-container">
-            <div class="chart-title">Daily Token Purchases</div>
+            <div class="chart-title">Token Purchases Surge on the 1st, Reflecting Monthly Reset and Discounts</div>
             <canvas id="areaChart3"></canvas>
             <p>
                 The chart highlights a spike in token purchases on the 1st of October, which is likely attributed to discounted tokens being reset at the beginning of the month. This incentivizes households to make larger purchases early on to maximize savings. The subsequent decline in purchases reflects regular consumption patterns. Minor peaks toward the end of the month could indicate users purchasing tokens to avoid running out of electricity before the next reset.
@@ -119,7 +123,7 @@
 
          <!-- Fourth Chart -->
         <div class="chart-container">
-            <div class="chart-title">Hourly Token Purchases</div>
+            <div class="chart-title">Daily Token Purchase Behavior: A Reflection of Work Schedules and Lifestyle Patterns</div>
             <canvas id="areaChart4"></canvas>
             <p>
                 The chart shows token purchase activity throughout the day, with noticeable peaks during morning and evening hours. The morning spike, particularly at 7 AM, aligns with government offices opening and people starting their day. A slight dip around 1-2 PM likely corresponds to lunch breaks when fewer transactions occur. The evening peak at 5-7 PM aligns with commute times after work, when many individuals make last-minute purchases. The evening drop-off after 8 PM may reflect the closing hours of supermarkets and independent establishments, which tend to limit purchasing activity after this time.
