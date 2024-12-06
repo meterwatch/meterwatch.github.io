@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consumer Energy Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GVRPV64YPR"></script>
+    <style>
+        :root {
+            --primary: #c74e20;
+            --secondary: #3c3251;
+            --background: #f8f9fa;
+            --foreground: #333;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--background);
+            color: var(--foreground);
+            padding-top: 56px; /* Account for fixed navbar */
+        }
+        .navbar {
+            background-color: var(--secondary);
+        }
+        .navbar-brand, .nav-link {
+            color: #fff !important;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: var(--primary);
+            color: #fff;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        .month-selector {
+            max-width: 200px;
+            margin-bottom: 1rem;
+        }
+    </style>
+      <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+      <link rel="manifest" href="site.webmanifest">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Meter Watch </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Energy Reports</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Loadshedding.html">LoadShedding Calendar</a>
+                    </li>
+                    <li class="nav-item">
+                        <!--<a class="nav-link" href="#days-between">Days Between Purchases</a>-->
+                    </li>
+                    <li class="nav-item">
+                        <!--<a class="nav-link" href="#summary">Summary</a>-->
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <section id="token-value">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Token Value Comparison</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <select id="tokenValueMonth1" class="form-select month-selector">
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9" selected>October</option>
+                                <option value="10">November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <select id="tokenValueMonth2" class="form-select month-selector">
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9">October</option>
+                                <option value="10" selected>November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
+                    </div>
+                    <canvas id="tokenValueChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="hourly-purchases">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Hourly Token Purchases</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <select id="hourlyPurchasesMonth1" class="form-select month-selector">
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9" selected>October</option>
+                                <option value="10">November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <select id="hourlyPurchasesMonth2" class="form-select month-selector">
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9">October</option>
+                                <option value="10" selected>November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
+                    </div>
+                    <canvas id="hourlyPurchasesChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="daily-purchases">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Daily Token Purchases</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <select id="dailyPurchasesMonth1" class="form-select month-selector">
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9" selected>October</option>
+                                <option value="10">November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <select id="dailyPurchasesMonth2" class="form-select month-selector">
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9">October</option>
+                                <option value="10" selected>November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
+                    </div>
+                    <canvas id="dailyPurchasesChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="days-between">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Days Between Purchases</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <select id="daysBetweenMonth1" class="form-select month-selector">
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9" selected>October</option>
+                                <option value="10">November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <select id="daysBetweenMonth2" class="form-select month-selector">
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9">October</option>
+                                <option value="10" selected>November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
+                    </div>
+                    <canvas id="daysBetweenChart"></canvas>
+                    <div class="table-responsive mt-4">
+                        <table class="table table-striped" id="daysBetweenTable">
+                            <thead>
+                                <tr>
+                                    <th>Meter Number</th>
+                                    <th id="daysBetweenMonth1Header">October</th>
+                                    <th id="daysBetweenMonth2Header">November</th>
+                                    <th>Percentage Difference</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Table data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="summary">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Summary</h2>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th id="summaryMonth1Header">October</th>
+                                <th id="summaryMonth2Header">November</th>
+                                <th>Percentage Difference</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Average Days Between Purchases</td>
+                                <td id="month1Avg"></td>
+                                <td id="month2Avg"></td>
+                                <td id="avgDiff"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample data for all months
+        const monthlyData = [
+            { tokenValue: 40.50, hourlyPurchases: [8, 4, 2, 1, 1, 3, 6, 12, 20, 25, 30, 35, 33, 37, 40, 45, 50, 55, 53, 47, 40, 30, 20, 12], dailyPurchases: [15, 18, 22, 20, 25, 30, 35, 28, 32, 40, 38, 42, 45, 50, 48, 52, 55, 58, 60, 62, 58, 54, 50, 48, 45, 42, 40, 38, 35, 32, 30] },
+            { tokenValue: 42.75, hourlyPurchases: [9, 5, 3, 2, 1, 3, 7, 13, 22, 27, 32, 37, 35, 39, 42, 47, 52, 57, 55, 49, 42, 32, 22, 13], dailyPurchases: [18, 20, 25, 22, 28, 32, 38, 30, 35, 42, 40, 45, 48, 52, 50, 55, 58, 60, 62, 65, 60, 56, 52, 50, 48, 45, 42, 40, 38, 35] },
+            { tokenValue: 43.20, hourlyPurchases: [9, 5, 3, 2, 1, 4, 7, 14, 23, 28, 33, 38, 36, 40, 43, 48, 53, 58, 56, 50, 43, 33, 23, 14], dailyPurchases: [20, 22, 28, 25, 30, 35, 40, 32, 38, 45, 42, 48, 50, 55, 52, 58, 60, 62, 65, 68, 62, 58, 55, 52, 50, 48, 45, 42, 40, 38] },
+            { tokenValue: 44.80, hourlyPurchases: [10, 6, 3, 2, 1, 4, 8, 15, 24, 29, 34, 39, 37, 41, 44, 49, 54, 59, 57, 51, 44, 34, 24, 15], dailyPurchases: [22, 25, 30, 28, 32, 38, 42, 35, 40, 48, 45, 50, 52, 58, 55, 60, 62, 65, 68, 70, 65, 60, 58, 55, 52, 50, 48, 45, 42, 40] },
+            { tokenValue: 46.30, hourlyPurchases: [10, 6, 3, 2, 1, 4, 8, 15, 25, 30, 35, 40, 38, 42, 45, 50, 55, 60, 58, 52, 45, 35, 25, 15], dailyPurchases: [25, 28, 32, 30, 35, 40, 45, 38, 42, 50, 48, 52, 55, 60, 58, 62, 65, 68, 70, 72, 68, 62, 60, 58, 55, 52, 50, 48, 45, 42, 40] },
+            { tokenValue: 47.90, hourlyPurchases: [11, 6, 4, 2, 1, 5, 9, 16, 26, 31, 36, 41, 39, 43, 46, 51, 56, 61, 59, 53, 46, 36, 26, 16], dailyPurchases: [28, 30, 35, 32, 38, 42, 48, 40, 45, 52, 50, 55, 58, 62, 60, 65, 68, 70, 72, 75, 70, 65, 62, 60, 58, 55, 52, 50, 48, 45] },
+            { tokenValue: 49.10, hourlyPurchases: [11, 7, 4, 3, 2, 5, 9, 17, 27, 32, 37, 42, 40, 44, 47, 52, 57, 62, 60, 54, 47, 37, 27, 17], dailyPurchases: [30, 32, 38, 35, 40, 45, 50, 42, 48, 55, 52, 58, 60, 65, 62, 68, 70, 72, 75, 78, 72, 68, 65, 62, 60, 58, 55, 52, 50, 48, 45] },
+            { tokenValue: 50.40, hourlyPurchases: [12, 7, 4, 3, 2, 5, 10, 18, 28, 33, 38, 43, 41, 45, 48, 53, 58, 63, 61, 55, 48, 38, 28, 18], dailyPurchases: [32, 35, 40, 38, 42, 48, 52, 45, 50, 58, 55, 60, 62, 68, 65, 70, 72, 75, 78, 80, 75, 70, 68, 65, 62, 60, 58, 55, 52, 50, 48] },
+            { tokenValue: 51.80, hourlyPurchases: [12, 7, 4, 3, 2, 6, 10, 18, 29, 34, 39, 44, 42, 46, 49, 54, 59, 64, 62, 56, 49, 39, 29, 18], dailyPurchases: [35, 38, 42, 40, 45, 50, 55, 48, 52, 60, 58, 62, 65, 70, 68, 72, 75, 78, 80, 82, 78, 72, 70, 68, 65, 62, 60, 58, 55, 52, 50] },
+            { tokenValue: 45.75, hourlyPurchases: [10, 5, 3, 2, 1, 4, 8, 15, 25, 30, 35, 40, 38, 42, 45, 50, 55, 60, 58, 52, 45, 35, 25, 15], dailyPurchases: [25, 28, 32, 30, 35, 40, 45, 38, 42, 50, 48, 52, 55, 60, 58, 62, 65, 68, 70, 72, 68, 62, 60, 58, 55, 52, 50, 48, 45, 42, 40] },
+            { tokenValue: 52.30, hourlyPurchases: [13, 8, 5, 3, 2, 6, 11, 19, 30, 35, 40, 45, 43, 47, 50, 55, 60, 65, 63, 57, 50, 40, 30, 19], dailyPurchases: [38, 40, 45, 42, 48, 52, 58, 50, 55, 62, 60, 65, 68, 72, 70, 75, 78, 80, 82, 85, 80, 75, 72, 70, 68, 65, 62, 60, 58, 55, 52] },
+            { tokenValue: 53.90, hourlyPurchases: [13, 8, 5, 3, 2, 6, 11, 20, 31, 36, 41, 46, 44, 48, 51, 56, 61, 66, 64, 58, 51, 41, 31, 20], dailyPurchases: [40, 42, 48, 45, 50, 55, 60, 52, 58, 65, 62, 68, 70, 75, 72, 78, 80, 82, 85, 88, 82, 78, 75, 72, 70, 68, 65, 62, 60, 58, 55] }
+        ];
+
+        const daysBetweenPurchasesData = [
+            { meter: "Meter 1", data: [7.2, 7.5, 7.8, 8.1, 8.4, 8.7, 9.0, 9.3, 9.6, 6.8, 7.1, 7.4] },
+            { meter: "Meter 2", data: [8.5, 8.8, 9.1, 9.4, 9.7, 10.0, 10.3, 10.6, 10.9, 7.9, 8.2, 8.5] },
+            { meter: "Meter 3", data: [6.9, 7.2, 7.5, 7.8, 8.1, 8.4, 8.7, 9.0, 9.3, 7.1, 7.4, 7.7] },
+            { meter: "Meter 4", data: [9.1, 9.4, 9.7, 10.0, 10.3, 10.6, 10.9, 11.2, 11.5, 8.3, 8.6, 8.9] },
+            { meter: "Meter 5", data: [7.8, 8.1, 8.4, 8.7, 9.0, 9.3, 9.6, 9.9, 10.2, 7.5, 7.8, 8.1] }
+        ];
+
+        let tokenValueChart, hourlyPurchasesChart, dailyPurchasesChart, daysBetweenChart;
+
+        function updateTokenValueChart() {
+            const month1 = parseInt(document.getElementById('tokenValueMonth1').value);
+            const month2 = parseInt(document.getElementById('tokenValueMonth2').value);
+            const chartData = {
+                labels: [getMonthName(month1), getMonthName(month2)],
+                datasets: [{
+                    label: 'Average Token Value',
+                    data: [monthlyData[month1].tokenValue, monthlyData[month2].tokenValue],
+                    backgroundColor: ['#c74e20', '#3c3251'],
+                    borderColor: ['#c74e20', '#3c3251'],
+                    borderWidth: 1
+                }]
+            };
+            tokenValueChart.data = chartData;
+            tokenValueChart.update();
+        }
+
+        function updateHourlyPurchasesChart() {
+            const month1 = parseInt(document.getElementById('hourlyPurchasesMonth1').value);
+            const month2 = parseInt(document.getElementById('hourlyPurchasesMonth2').value);
+            const chartData = {
+                labels: Array.from({length: 24}, (_, i) => i),
+                datasets: [
+                    {
+                        label: getMonthName(month1),
+                        data: monthlyData[month1].hourlyPurchases,
+                        borderColor: '#c74e20',
+                        backgroundColor: 'rgba(199, 78, 32, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: getMonthName(month2),
+                        data: monthlyData[month2].hourlyPurchases,
+                        borderColor: '#3c3251',
+                        backgroundColor: 'rgba(60, 50, 81, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            };
+            hourlyPurchasesChart.data = chartData;
+            hourlyPurchasesChart.options.plugins.title.text = `Hourly Token Purchases Comparison`;
+            hourlyPurchasesChart.update();
+        }
+
+        function updateDailyPurchasesChart() {
+            const month1 = parseInt(document.getElementById('dailyPurchasesMonth1').value);
+            const month2 = parseInt(document.getElementById('dailyPurchasesMonth2').value);
+            const chartData = {
+                labels: Array.from({length: 31}, (_, i) => i + 1),
+                datasets: [
+                    {
+                        label: getMonthName(month1),
+                        data: monthlyData[month1].dailyPurchases,
+                        borderColor: '#c74e20',
+                        backgroundColor: 'rgba(199, 78, 32, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: getMonthName(month2),
+                        data: monthlyData[month2].dailyPurchases,
+                        borderColor: '#3c3251',
+                        backgroundColor: 'rgba(60, 50, 81, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            };
+            dailyPurchasesChart.data = chartData;
+            dailyPurchasesChart.options.plugins.title.text = `Daily Token Purchases Comparison`;
+            dailyPurchasesChart.update();
+        }
+
+        function updateDaysBetweenChart() {
+            const month1 = parseInt(document.getElementById('daysBetweenMonth1').value);
+            const month2 = parseInt(document.getElementById('daysBetweenMonth2').value);
+            const month1Data = daysBetweenPurchasesData.map(d => d.data[month1]);
+            const month2Data = daysBetweenPurchasesData.map(d => d.data[month2]);
+            const percentageDiff = month1Data.map((v, i) => ((month2Data[i] - v) / v * 100).toFixed(2));
+
+            const chartData = {
+                labels: daysBetweenPurchasesData.map(d => d.meter),
+                datasets: [
+                    {
+                        label: getMonthName(month1),
+                        data: month1Data,
+                        backgroundColor: '#c74e20',
+                    },
+                    {
+                        label: getMonthName(month2),
+                        data: month2Data,
+                        backgroundColor: '#3c3251',
+                    },
+                    {
+                        label: 'Percentage Difference',
+                        data: percentageDiff,
+                        backgroundColor: '#6c757d',
+                        type: 'line',
+                        yAxisID: 'percentage'
+                    }
+                ]
+            };
+            daysBetweenChart.data = chartData;
+            daysBetweenChart.update();
+
+            updateDaysBetweenTable(month1, month2, month1Data, month2Data, percentageDiff);
+            updateSummary(month1, month2, month1Data, month2Data);
+        }
+
+        function updateDaysBetweenTable(month1, month2, month1Data, month2Data, percentageDiff) {
+            const tableBody = document.getElementById('daysBetweenTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+            daysBetweenPurchasesData.forEach((d, i) => {
+                let row = tableBody.insertRow();
+                row.insertCell(0).textContent = d.meter;
+                row.insertCell(1).textContent = month1Data[i].toFixed(2);
+                row.insertCell(2).textContent = month2Data[i].toFixed(2);
+                row.insertCell(3).textContent = `${percentageDiff[i]}%`;
+            });
+            document.getElementById('daysBetweenMonth1Header').textContent = getMonthName(month1);
+            document.getElementById('daysBetweenMonth2Header').textContent = getMonthName(month2);
+        }
+
+        function updateSummary(month1, month2, month1Data, month2Data) {
+            const month1Avg = (month1Data.reduce((a, b) => a + b, 0) / month1Data.length).toFixed(2);
+            const month2Avg = (month2Data.reduce((a, b) => a + b, 0) / month2Data.length).toFixed(2);
+            const avgDiff = ((month2Avg - month1Avg) / month1Avg * 100).toFixed(2);
+
+            document.getElementById('month1Avg').textContent = month1Avg;
+            document.getElementById('month2Avg').textContent = month2Avg;
+            document.getElementById('avgDiff').textContent = `${avgDiff}%`;
+            document.getElementById('summaryMonth1Header').textContent = getMonthName(month1);
+            document.getElementById('summaryMonth2Header').textContent = getMonthName(month2);
+        }
+
+        function getMonthName(monthIndex) {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            return months[monthIndex];
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const tokenValueCtx = document.getElementById('tokenValueChart').getContext('2d');
+            tokenValueChart = new Chart(tokenValueCtx, {
+                type: 'bar',
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Average Token Value'
+                            }
+                        }
+                    }
+                }
+            });
+
+            const hourlyPurchasesCtx = document.getElementById('hourlyPurchasesChart').getContext('2d');
+            hourlyPurchasesChart = new Chart(hourlyPurchasesCtx, {
+                type: 'line',
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Hour of Day'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Purchases'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return `Hour: ${context[0].label}:00`;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Hourly Token Purchases'
+                        }
+                    }
+                }
+            });
+
+            const dailyPurchasesCtx = document.getElementById('dailyPurchasesChart').getContext('2d');
+            dailyPurchasesChart = new Chart(dailyPurchasesCtx, {
+                type: 'line',
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Day of Month'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Purchases'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return `Day: ${context[0].label}`;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Daily Token Purchases'
+                        }
+                    }
+                }
+            });
+
+            const daysBetweenCtx = document.getElementById('daysBetweenChart').getContext('2d');
+            daysBetweenChart = new Chart(daysBetweenCtx, {
+                type: 'bar',
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Days Between Purchases'
+                            }
+                        },
+                        percentage: {
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Percentage Difference'
+                            }
+                        }
+                    }
+                }
+            });
+
+            updateTokenValueChart();
+            updateHourlyPurchasesChart();
+            updateDailyPurchasesChart();
+            updateDaysBetweenChart();
+
+            document.getElementById('tokenValueMonth1').addEventListener('change', updateTokenValueChart);
+            document.getElementById('tokenValueMonth2').addEventListener('change', updateTokenValueChart);
+            document.getElementById('hourlyPurchasesMonth1').addEventListener('change', updateHourlyPurchasesChart);
+            document.getElementById('hourlyPurchasesMonth2').addEventListener('change', updateHourlyPurchasesChart);
+            document.getElementById('dailyPurchasesMonth1').addEventListener('change', updateDailyPurchasesChart);
+            document.getElementById('dailyPurchasesMonth2').addEventListener('change', updateDailyPurchasesChart);
+            document.getElementById('daysBetweenMonth1').addEventListener('change', updateDaysBetweenChart);
+            document.getElementById('daysBetweenMonth2').addEventListener('change', updateDaysBetweenChart);
+        });
+    </script>
+</body>
+</html>
