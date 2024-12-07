@@ -359,6 +359,18 @@
 		    max-width: 800px;
 		    margin: 0 auto 30px;
 		}
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        .navbar-toggler {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.2);
+        }
     </style>
     <style>
 
@@ -494,7 +506,9 @@
             </div>
             <div class="col-md-8 mb-4">
                 <div class="chart-container">
-                    <div class="chart-title">51kWh - 10kWh still the most common kWh range purchase in October 2024</div>
+                    <div class="chart-title">
+                        51–100 kWh Dominates November 2024 Purchases Amid Notable Spike in 951–1000 kWh Range
+                    </div>
                     <div class="chart-wrapper">
                         <canvas id="loadshedding-chart"></canvas>
                     </div>
@@ -506,7 +520,7 @@
     						id="view-more-button" 
     						class="btn btn-primary me-2" 
     						style="border-radius: 0;">
-    						View October Energy Report
+    						View November Energy Report
 						</button>
                     </a>
                 </div>
@@ -533,10 +547,10 @@
                 <div class="week">
                     <div class="day" style="background-color: #A3D977;" data-value="0">1<span class="day-tooltip">December 2024</span></div>
                     <div class="day" style="background-color: #A3D977;" data-value="0">2<span class="day-tooltip">December 2024</span></div>
-                    <div class="day" style="background-color: #D3D3D3;" data-value="0">3<span class="day-tooltip">December 2024</span></div>
-                    <div class="day" style="background-color: #D3D3D3;" data-value="0">4<span class="day-tooltip">December 2024</span></div>
-                    <div class="day" style="background-color: #D3D3D3;" data-value="0">5<span class="day-tooltip">December 2024</span></div>
-                    <div class="day" style="background-color: #D3D3D3;" data-value="0">6<span class="day-tooltip">December 2024</span></div>
+                    <div class="day" style="background-color: #A3D977;" data-value="0">3<span class="day-tooltip">December 2024</span></div>
+                    <div class="day" style="background-color: #A3D977;" data-value="0">4<span class="day-tooltip">December 2024</span></div>
+                    <div class="day" style="background-color: #A3D977;" data-value="0">5<span class="day-tooltip">December 2024</span></div>
+                    <div class="day" style="background-color: #A3D977;" data-value="0">6<span class="day-tooltip">December 2024</span></div>
                     <div class="day" style="background-color: #D3D3D3;" data-value="0">7<span class="day-tooltip">December 2024</span></div>
                 </div>
                 <div class="week">
@@ -817,17 +831,17 @@
 		            datasets: [
 		                {
 		                    label: 'Hwange',
-		                    data: [1014, 964],
+		                    data: [1014, 829],
 		                    backgroundColor: '#c74e20', // Color for Hwange
 		                },
 		                {
 		                    label: 'Kariba',
-		                    data: [124.5, 540],
+		                    data: [124.5, 490],
 		                    backgroundColor: '#3c3251', // Color for Kariba
 		                },
 		                {
 		                    label: 'IPP',
-		                    data: [50, 37],
+		                    data: [51, 38],
 		                    backgroundColor: '#D0D0D9', // Color for IPP
 		                }
 		            ]
@@ -841,7 +855,7 @@
 		                },
 		                title: {
 		                    display: true,
-		                    text: '03 December 2024 vs 01 December 2023'
+		                    text: '06 December 2024 vs 06 December 2023'
 		                }
 		            },
 		            scales: {
@@ -864,7 +878,7 @@
         function createLoadshedingChart() {
             const ctx = document.getElementById('loadshedding-chart').getContext('2d');
             const data = [
-                0,41,21,20,10,15,7,11,7,5,2,9,1,5,3,4,1,0,1,5,1,0,5
+            5,15,12,10,19, 8, 7, 3, 9, 5,8, 2, 9, 3, 6, 1, 5, 1, 6,52
                 ];
             new Chart(ctx, {
                 type: 'line',
@@ -873,7 +887,7 @@
                         "0-50","51-100","101-150","151-200","201-250","251-300","301-350","351-400","401-450","451-500","501-550","551-600","601-650","651-700","701-750","751-800","801-850","851-900","901-950","951-1000","1001-1050","1051-1100","1100+"
                         ],
                     datasets: [{
-                        label: 'Most Common kWh Purchases - October 2024',
+                        label: 'Most Common kWh Purchases - November 2024',
                         data: data,
                         backgroundColor: '#c74e20',
                         borderColor: '#3c3251',
