@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Power Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <style>
+        :root {
+            --background: 240 10% 93%;
+            --foreground: 256 24% 28%;
+            --card: 0 0% 100%;
+            --card-foreground: 256 24% 28%;
+            --primary: 14 72% 45%;
+            --primary-foreground: 0 0% 100%;
+            --secondary: 256 24% 28%;
+            --secondary-foreground: 240 10% 93%;
+            --muted: 240 5% 96%;
+            --muted-foreground: 256 8% 38%;
+            --accent: 14 72% 45%;
+            --accent-foreground: 0 0% 100%;
+            --radius: 0.5rem;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+        }
+
+        .navbar {
+            background-color: #3c3251;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            color: #ececf0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .nav-link {
+            color: #ececf0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #c74e20;
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        .navbar-toggler {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.2);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .upload-section {
+            background-color: hsl(var(--card));
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .upload-section h5 {
+            color: hsl(var(--card-foreground));
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group .form-control {
+            border-radius: var(--radius) 0 0 var(--radius);
+            border: 1px solid hsl(var(--muted-foreground) / 0.2);
+        }
+
+        .input-group .btn {
+            border-radius: 0 var(--radius) var(--radius) 0;
+            background-color: hsl(var(--primary));
+            border-color: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+        }
+
+        .btn-group {
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-group .btn {
+            border-radius: var(--radius);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+        }
+
+        .btn-outline-primary {
+            color: hsl(var(--primary));
+            border-color: hsl(var(--primary));
+        }
+
+        .btn-outline-primary:hover {
+            background-color: hsl(var(--primary));
+            border-color: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            height: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .metric-title {
+            color: hsl(var(--primary-foreground));
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            color: hsl(var(--primary-foreground));
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .chart-container {
+            background-color: hsl(var(--card));
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            height: 500px; /* Set a fixed height */
+        }
+
+        .chart-title {
+            color: hsl(var(--card-foreground));
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        #powerChart {
+            min-height: 400px;
+        }
+
+        .alert-info {
+            background-color: hsl(var(--muted));
+            border: none;
+            color: hsl(var(--muted-foreground));
+            border-radius: var(--radius);
+            padding: 1rem 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .metric-card {
+                margin-bottom: 1rem;
+            }
+
+            .btn-group {
+                flex-wrap: wrap;
+            }
+
+            .btn-group .btn {
+                width: calc(50% - 0.25rem);
+            }
+        }
+    </style>
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+	<link rel="manifest" href="site.webmanifest">
+	<!-- Google Tag Manager -->
+	<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-MWC458DP');</script>
+    <!-- End Google Tag Manager -->
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+	<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MWC458DP"height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Meter Watch</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <!--<a class="nav-link" href="#">About</a>-->
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="report.html">Energy Reports</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="loadshedding.html">LoadShedding Calendar</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="upload-section">
+                    <h5>Upload Solar Data</h5>
+                    <div class="input-group">
+                        <input type="file" class="form-control" id="csvFile" accept=".csv">
+                        <button class="btn btn-primary" onclick="handleFileUpload()">Upload</button>
+                    </div>
+                    <small class="text-muted">Upload CSV file with columns: id, rawdata, created_at</small>
+                    <a href="https://drive.google.com/drive/folders/1QirdyPut3QbLRDBtfMhrUo9Y0rgwevno" style="color: red;">Download sample data here</a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="alert alert-info" id="dataInfo" style="display: none;">
+                    <strong>Data loaded:</strong> <span id="dataPoints">0</span> points<br>
+                    <strong>Period:</strong> <span id="startDate">-</span> to <span id="endDate">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="btn-group" role="group">
+                    <button class="btn btn-outline-primary" onclick="setTimeRange('1h')">1 Hour</button>
+                    <button class="btn btn-outline-primary" onclick="setTimeRange('3h')">3 Hours</button>
+                    <button class="btn btn-outline-primary" onclick="setTimeRange('6h')">6 Hours</button>
+                    <button class="btn btn-outline-primary" onclick="setTimeRange('12h')">12 Hours</button>
+                    <button class="btn btn-outline-primary" onclick="setTimeRange('24h')">24 Hours</button>
+                    <button class="btn btn-outline-primary" onclick="setTimeRange('all')">All Data</button>
+                    
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text">Custom Range</span>
+                    <input type="datetime-local" id="startTime" class="form-control" onchange="setCustomTimeRange()">
+                    <input type="datetime-local" id="endTime" class="form-control" onchange="setCustomTimeRange()">
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #2ecc71, #27ae60)">
+                <div class="metric-title">PV Generation</div>
+                <div class="metric-value" id="pvGeneration">0 W</div>
+            </div>
+            </div>
+            <div class="col-md-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #e74c3c, #c0392b)">
+                <div class="metric-title">Power Usage</div>
+                <div class="metric-value" id="powerUsage">0 W</div>
+            </div>
+            </div>
+            <div class="col-md-3">
+            <div class="metric-card" style="background: linear-gradient(135deg, #3498db, #2980b9)">
+                    <div class="metric-title">Grid Power</div>
+                    <div class="metric-value" id="gridPower">0 W</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card" style="background: linear-gradient(135deg, #f1c40f, #f39c12)">
+                    <div class="metric-title">Inverter Power</div>
+                    <div class="metric-value" id="inverterPower">0 W</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">Power Metrics Over Time</div>
+            <canvas id="powerChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let allData = [];
+        let powerChart;
+
+        // Initialize the chart
+        function initChart() {
+            const ctx = document.getElementById('powerChart').getContext('2d');
+            powerChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'PV Generation',
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        data: [],
+                        parsing: {
+                            xAxisKey: 'timestamp',
+                            yAxisKey: 'pvGeneration'
+                        }
+                    }, {
+                        label: 'Power Usage',
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                        data: [],
+                        parsing: {
+                            xAxisKey: 'timestamp',
+                            yAxisKey: 'powerUsage'
+                        }
+                    }, {
+                        label: 'Grid Power',
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        data: [],
+                        parsing: {
+                            xAxisKey: 'timestamp',
+                            yAxisKey: 'gridPower'
+                        }
+                    }, {
+                        label: 'Inverter Power',
+                        borderColor: '#f1c40f',
+                        backgroundColor: 'rgba(241, 196, 15, 0.1)',
+                        data: [],
+                        parsing: {
+                            xAxisKey: 'timestamp',
+                            yAxisKey: 'inverterPower'
+                        }
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Power Metrics Over Time'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'minute',
+                                displayFormats: {
+                                    minute: 'HH:mm'
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Power (W)'
+                            }
+                        }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const element = elements[0];
+                            const datasetIndex = element.datasetIndex;
+                            const index = element.index;
+                            const data = powerChart.data.datasets[datasetIndex].data[index];
+
+                            document.getElementById('pvGeneration').innerText = data.pvGeneration + ' W';
+                            document.getElementById('powerUsage').innerText = data.powerUsage + ' W';
+                            document.getElementById('gridPower').innerText = data.gridPower + ' W';
+                            document.getElementById('inverterPower').innerText = data.inverterPower + ' W';
+                        }
+                    }
+                }
+            });
+        }
+
+        // Handle file upload
+        function handleFileUpload() {
+            const fileInput = document.getElementById('csvFile');
+            const file = fileInput.files[0];
+            if (file) {
+                Papa.parse(file, {
+                    header: true,
+                    dynamicTyping: true,
+                    complete: function(results) {
+                        processUploadedData(results.data);
+                    }
+                });
+            }
+        }
+
+        // Process uploaded data
+        function processUploadedData(data) {
+            allData = data.map((row, index) => {
+                try {
+                    // Parse the bigdata string into array
+                    const bigdata = row.bigdata && typeof row.bigdata === 'string' ? JSON.parse(row.bigdata.replace(/\s+/g, '')) : [];
+                    const timestamp = new Date(row.created_at);
+                    if (isNaN(timestamp)) {
+                        throw new Error(`Invalid date format at row ${index + 1}`);
+                    }
+                    console.log('Parsed Row:', { timestamp, bigdata }); // Debugging line
+                    return {
+                        timestamp,
+                        powerUsage: bigdata[14],
+                        pvGeneration: bigdata[83] || 0,
+                        gridPower: bigdata[13],
+                        inverterPower: bigdata[12],
+                        accumulatedPVPowerHigh1: bigdata[95].toFixed(2),
+                        accumulatedPVPowerLow1: bigdata[96].toFixed(2),
+                        loadPercent: bigdata[15].toFixed(2)
+                    };
+                } catch (error) {
+                    console.error(`Error processing row ${index + 1}:`, error);
+                    return null;
+                }
+            }).filter(row => row !== null).sort((a, b) => a.timestamp - b.timestamp);
+
+            // Update data info
+            document.getElementById('dataInfo').style.display = 'block';
+            document.getElementById('dataPoints').textContent = allData.length;
+            document.getElementById('startDate').textContent = allData[0].timestamp.toLocaleString();
+            document.getElementById('endDate').textContent = allData[allData.length - 1].timestamp.toLocaleString();
+
+            // Update chart with all data initially
+            updateChartData(allData);
+            setTimeRange('1h'); // Show last hour by default
+        }
+
+        // Update chart with filtered data
+        function updateChartData(filteredData) {
+            if (powerChart && powerChart.data && powerChart.data.datasets) {
+                powerChart.data.datasets.forEach((dataset) => {
+                    dataset.data = filteredData;
+                });
+                powerChart.update();
+            }
+
+            // Update metrics with latest values
+            if (filteredData.length > 0) {
+                const latest = filteredData[filteredData.length - 1];
+                console.log('Latest Data:', latest); // Debugging line
+                document.getElementById('pvGeneration').textContent = `${(latest.pvGeneration || 0).toFixed(2)} W`;
+                document.getElementById('powerUsage').textContent = `${(latest.powerUsage || 0).toFixed(2)} W`;
+                document.getElementById('gridPower').textContent = `${(latest.gridPower || 0).toFixed(2)} W`;
+                document.getElementById('inverterPower').textContent = `${(latest.inverterPower || 0).toFixed(2)} W`;
+            }
+        }
+
+        // Time range navigation functions
+        function setTimeRange(range) {
+            console.log(`setTimeRange called with range: ${range}`); // Debugging line
+            if (!allData.length) return;
+
+            const end = new Date(allData[allData.length - 1].timestamp);
+            let start = new Date(end);
+            
+            switch(range) {
+                case '1h':
+                    start.setHours(end.getHours() - 1);
+                    break;
+                case '3h':
+                    start.setHours(end.getHours() - 3);
+                    break;
+                case '6h':
+                    start.setHours(end.getHours() - 6);
+                    break;
+                case '12h':
+                    start.setHours(end.getHours() - 12);
+                    break;
+                case '24h':
+                    start.setHours(end.getHours() - 24);
+                    break;
+                case 'all':
+                    start = new Date(allData[0].timestamp);
+                    break;
+            }
+
+            const filteredData = allData.filter(d => 
+                d.timestamp >= start && d.timestamp <= end
+            );
+            console.log(`Filtered Data:`, filteredData); // Debugging line
+            updateChartData(filteredData);
+        }
+
+        function setCustomTimeRange() {
+            const start = new Date(document.getElementById('startTime').value);
+            const end = new Date(document.getElementById('endTime').value);
+            
+            const filteredData = allData.filter(d => 
+                d.timestamp >= start && d.timestamp <= end
+            );
+            updateChartData(filteredData);
+        }
+
+       
+
+        // Initialize chart on load
+        initChart();
+    </script>
+</body>
+</html>
