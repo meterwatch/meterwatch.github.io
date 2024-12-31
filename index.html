@@ -533,6 +533,18 @@
 	<!-- End of Intro Blurb  -->
 
 	<div class="container">
+		<!--Purchase history summary -->
+		<div id="purchase-history-container" class="chart-container" style="display: none;">
+            <div class="chart-title">Purchase History</div>
+            <div class="chart-wrapper">
+                <canvas id="purchase-history-chart"></canvas>
+            </div>
+            <div class="d-flex justify-content-center mt-3">
+                <button id="view-more-button" class="btn btn-primary me-2">View More Details</button>
+                <button id="hide-button" class="btn btn-secondary">Hide</button>
+            </div>
+        </div>
+	<!--End of Purchase history summary -->
 		<!-- New Features -->
 		<div class="row"> 
 			<div class="col-md-6 mb-6"> 
@@ -542,9 +554,9 @@
 							Live Monitoring Demo 🚀
 						</div> 
 								<p>Track your energy usage in real time and see solar production at a glance. See how your home performs right now!</p>
-								<button class="btn btn-outline-primary">
-								View Live Demo
-							</button>
+								<a href="powerCharts.html" class="btn btn-outline-primary">View Live Demo</a>
+								
+							
 					</div>
 				</div> 
 			</div> 
