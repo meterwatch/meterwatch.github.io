@@ -418,13 +418,53 @@
     #loading-spinner {
         display: none ;
     }
-</style>
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="manifest" href="site.webmanifest">
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+	</style>
+	<style>
+    	/* Features Section */
+		.features-section {
+		display: flex;
+		justify-content: space-between;
+		margin-top: 40px;
+		gap: 20px;
+		}
+			.feature-card {
+		flex: 1;
+		background-color: #fff;
+		padding: 20px;
+		border-radius: 8px;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+		text-align: center;
+		}
+
+		.feature-card h3 {
+		font-size: 1.8rem;
+		margin-bottom: 10px;
+		}
+
+		.feature-card p {
+		font-size: 1rem;
+		margin-bottom: 20px;
+		color: #555;
+		}
+
+		.feature-card button {
+		font-size: 1rem;
+		padding: 10px 20px;
+		border-radius: 4px;
+		cursor: pointer;
+		}
+
+		.feature-card button:hover {
+		background-color: #0d6efd;
+		color: #fff;
+		}
+	</style>
+	<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+	<link rel="manifest" href="site.webmanifest">
+	<!-- Google Tag Manager -->
+	<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
@@ -433,8 +473,7 @@
 </head>
 <body>
     <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MWC458DP"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+	<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MWC458DP"height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
@@ -445,56 +484,57 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Home</a>
+                        <a class="nav-link" href="#">Home |</a>
                     </li>
                     <li class="nav-item">
                         <!--<a class="nav-link" href="#">About</a>-->
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="report.html">Energy Reports</a>
+                        <a class="nav-link" href="report.html">Energy Reports |</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="Loadshedding.html">LoadShedding Calendar</a>
+                        <a class="nav-link" href="Loadshedding.html">LoadShedding Calendar |</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
     <div class="hero">
-    <div class="container">
-        <div class="hero-content">
-            <div class="row">
-                <div class="col-md-6">
-                    <img src="lightbulb.svg" class="img-fluid" alt="" data-aos="zoom-out" data-aos-delay="100">
-                </div>
-                <div class="col-md-6">
-                    <h1>
-                        Meter Watch
-                    </h1>
-                    <p>
-                        Track your prepaid power usage effortlessly!
-                    </p>
-                    <div class="input-group mb-3">
-                        <input type="text" id="search-input" class="form-control" placeholder="Enter Zesa metre number" aria-label="Enter your account number" aria-describedby="search-button" >
-                        <button class="btn btn-primary" type="button" id="search-button">Check Now</button>
-                        <div id="loading-spinner" class="spinner-border text-primary ms-2" role="status" style="display: none;">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+		<div class="container">
+			<div class="hero-content">
+				<div class="row">
+					<div class="col-md-6">
+						<img src="lightbulb.svg" class="img-fluid" alt="" data-aos="zoom-out" data-aos-delay="100">
+					</div>
+					<div class="col-md-6">
+						<h1>
+							Meter Watch
+						</h1>
+						<p>
+							Track your prepaid power usage effortlessly!
+						</p>
+						<div class="input-group mb-3">
+							<input type="text" id="search-input" class="form-control" placeholder="Enter Zesa metre number" aria-label="Enter your account number" aria-describedby="search-button" >
+							<button class="btn btn-primary" type="button" id="search-button">Check Now</button>
+							<div id="loading-spinner" class="spinner-border text-primary ms-2" role="status" style="display: none;">
+								<span class="visually-hidden">Loading...</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Intro Blurb  -->
+	<div class="energy-report-section">
+		<h2 class="energy-report-heading">Harnessing Energy Data for a Sustainable Future</h2>
+		<p class="energy-report-description">MeterWatch provides real-time insights into energy generation and consumption trends. Explore interactive charts and analytics to make informed decisions for sustainability and efficiency."</p>
+	</div>
+	<!-- End of Intro Blurb  -->
 
-<!-- New Section for Energy Report -->
-<div class="energy-report-section">
-    <h2 class="energy-report-heading">Harnessing Energy Data for a Sustainable Future</h2>
-    <p class="energy-report-description">MeterWatch provides real-time insights into energy generation and consumption trends. Explore interactive charts and analytics to make informed decisions for sustainability and efficiency."</p>
-</div>
-
-    <div class="container">
-        <div id="purchase-history-container" class="chart-container" style="display: none;">
+	<div class="container">
+		<!--Purchase history summary -->
+		<div id="purchase-history-container" class="chart-container" style="display: none;">
             <div class="chart-title">Purchase History</div>
             <div class="chart-wrapper">
                 <canvas id="purchase-history-chart"></canvas>
@@ -504,41 +544,97 @@
                 <button id="hide-button" class="btn btn-secondary">Hide</button>
             </div>
         </div>
+	<!--End of Purchase history summary -->
+		<!-- New Features -->
+		<div class="row"> 
+			<div class="col-md-6 mb-6"> 
+				<div class="chart-container"> 
+					<div class="feature-card">
+						<div class="chart-title">
+							Live Monitoring Demo 🚀
+						</div> 
+								<p>Track your energy usage in real time and see solar production at a glance. See how your home performs right now!</p>
+								<a href="powerCharts.html" class="btn btn-outline-primary">View Live Demo</a>
+								
+							
+					</div>
+				</div> 
+			</div> 
+			<div class="col-md-6 mb-6"> 
+				<div class="chart-container"> 
+					<div class="feature-card">
+						<div class="chart-title">
+							<h3>Data Explorer Tool Demo 📊</h3>
+						</div> 
+						
+						<p>Upload and analyze energy trends to uncover insights and optimize usage. Dive deep into your historical data.</p>
+						<a href="timeseriesanalysis.html" class="btn btn-outline-primary">Try the Tool</a>
+					</div>
+				</div> 
+			</div>
+				
+			</div> 
+		</div>
+		<!-- End of New Features -->
+			
+		<!-- Power Generation Blurb -->
+		<div class="energy-report-section">
+			<h2 class="energy-report-heading">
+				Visualizing Energy Trends
+			</h2>
+			<p class="energy-report-description">
+				See energy data come to life with our dynamic charts. We provide frequently updated comparisons of year-on-year power generation (MW) alongside insights into evolving energy purchasing trends.
+			</p>
+		</div>
+		<!-- End of Power Generation Blurb -->
 
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="chart-container">
-                    <div class="chart-title">Power Generation Comparison (MW): 2024 vs 2023  </div>
-                    <div class="chart-wrapper">
-                        <canvas id="power-generation-chart"></canvas>
-                    </div>
-                    <p class="disclaimer">Source:www.zpc.co.zw </p>
-                </div>
-            </div>
-            <div class="col-md-8 mb-4">
-                <div class="chart-container">
-                    <div class="chart-title">
-                        51–100 kWh Dominates November 2024 Purchases Amid Notable Spike in 951–1000 kWh Range
-                    </div>
-                    <div class="chart-wrapper">
-                        <canvas id="loadshedding-chart"></canvas>
-                    </div>
-                    <p class="disclaimer">Source Belenga MyEnergy</p>
-                </div>
-                <div class="input-group button-container">
-                    <a href="report.html" >
-                       <button 
-    						id="view-more-button" 
-    						class="btn btn-primary me-2" 
-    						style="border-radius: 0;">
-    						View November Energy Report
-						</button>
-                    </a>
-                </div>
-            </div>
-        </div>
+    
+		
+		<!-- Power Genration stats-->
+        <div class="row"> 
+			<div class="col-md-4 mb-4"> 
+				<div class="chart-container"> 
+					<div class="chart-title">Power Generation	Comparison (MW): 2024 vs 2023  </div> 
+					<div class="chart-wrapper">
+        				<canvas id="power-generation-chart"></canvas> 
+					</div> 
+					<p	class="disclaimer">Source:www.zpc.co.zw </p> 
+				</div> 
+			</div> 
+			<div class="col-md-8 mb-4"> 
+				<div class="chart-container"> 
+					<div class="chart-title"> 
+						51–100 kWh Dominates November 2024 Purchases Amid Notable Spike in 951–1000 kWh Range 
+					</div> 
+					<div class="chart-wrapper"> 
+						<canvas id="loadshedding-chart"></canvas>
+					</div> 
+					<p class="disclaimer">Source Belenga MyEnergy</p> 
+				</div> 
+				<div class="input-group button-container"> 
+					<a href="report.html" > 
+						<button id="view-more-button" class="btn btn-primary me-2" style="border-radius: 0;"> 
+							View November Energy Report 
+						</button> 
+					</a>
+        		</div> 
+			</div> 
+		</div>
+		<!-- End of Power Genration stats-->
 
         <div class="chart-container">
+
+			<!-- Power Generation Blurb -->
+		<div class="energy-report-section">
+			<h2 class="energy-report-heading">
+				Loadshedding Historical Reference
+			</h2>
+			<p class="energy-report-description">
+				Refer to our historical calendar for a comprehensive record of past loadshedding events. This resource is designed for analysis and documentation.
+			</p>
+		</div>
+		<!-- End of Power Generation Blurb -->
+
     <div class="chart-title">
         Loadshedding Hours: December 2024
     </div>
